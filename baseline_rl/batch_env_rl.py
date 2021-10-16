@@ -59,12 +59,43 @@ class BatchEnvRL:
             idx += 1
         return x
 
+    def get_features1(self):
+        x = np.zeros((self.n_envs, self.n_nodes, 5))
+        idx = 0
+        for env in self.envs:
+            # 1, 2 - x,y coords
+            # 3, 4 - time window; -1 - maxT
+            x_ = np.concatenate((self._normalize_features(env.x[:, 1:3]),
+                                 self._normalize_features1(env.x[:, 3:5], env.x[:, -1][0]),
+                                 # env.x[:, 3:5],
+                                 env.x[:, -2, None]), axis=-1)
+            n_ = len(x_)
+            z_ = np.zeros((self.n_nodes-n_, 5))
+            x_ = np.concatenate((x_, z_), axis=0)
+            x[idx] = x_
+            idx += 1
+        return x
+
+    def get_features2(self):
+        x = np.zeros((self.n_envs, self.n_nodes, self.n_nodes + 4))
+        idx = 0
+        for env in self.envs:
+            x_ = env.x[:, 3:]
+            x_ = np.concatenate((x_, env.adj), axis=1)
+            x[idx] = x_
+            idx += 1
+        return x
+
     @staticmethod
     def _normalize_features(x):
         max_x = np.max(x, axis=0)
         min_x = np.min(x, axis=0)
 
         return (x - min_x) / (max_x - min_x)
+
+    @staticmethod
+    def _normalize_features1(x, max_x):
+        return x / max_x
 
     def step(self, next_nodes):
         tour_time = np.zeros((self.n_envs, 1))
