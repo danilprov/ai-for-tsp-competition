@@ -4,14 +4,12 @@ from collections import namedtuple, deque
 import torch
 
 
-Transition = namedtuple('Transition',
-                        ('state', 'action', 'next_state', 'reward', 'terminal'))
+Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward', 'terminal'))
 
 
 class ReplayMemory(object):
-
     def __init__(self, capacity):
-        self.memory = deque([],maxlen=capacity)
+        self.memory = deque([], maxlen=capacity)
 
     def push(self, *args):
         """Save a transition"""

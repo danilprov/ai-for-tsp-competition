@@ -49,29 +49,3 @@ def get_td_error(states, next_states, actions, rewards,
     loss = criterion(target_vec.unsqueeze(1), q_vec.unsqueeze(1))
 
     return loss
-
-
-if __name__ == '__main__':
-    from solutions.CNN_hidden_mask import NeuralNetwork
-
-    batch_size = 8
-    n_nodes = 20
-    discount = 0.99
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    network_config = {'state_dim': 6*n_nodes, 'num_actions': n_nodes}
-    model = NeuralNetwork(network_config=network_config).to(device)
-
-    network, current_q = model, model
-
-    # states = torch.ones(batch_size, 4, n_nodes).to(device)
-    states = torch.rand(batch_size, 6, n_nodes).to(device)
-    next_states = torch.ones(batch_size, 6, n_nodes).to(device) * 2
-    rewards = torch.zeros(batch_size, 1).to(device)
-    terminals = torch.zeros(batch_size, 1).to(device)
-    actions = torch.ones(batch_size, 1).to(device)
-
-    loss = get_td_error(states, next_states, actions, rewards,
-                        discount, terminals, network, current_q)
-
-    print(loss)
